@@ -1,6 +1,8 @@
-## PRAC-video-chat-app
+# PRAC-video-chat-app  
+  
+## Libraries  
 Web-RTC  
-Node.js  
+Node.js:
  -express  
  -socket.io  
  -nodemon  
