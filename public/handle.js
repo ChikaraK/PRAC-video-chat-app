@@ -4,6 +4,8 @@ const videoWrap = document.getElementById("video-wrap");
 const myVideo = document.createElement("video");
 myVideo.muted = true;
 const peers = {};
+let myVideoStream;
+
 /**
  * loadmetadataイベントでmetadataが読み込まれるたびにvido.play関数を実行, 親要素にvideoタグを追加する
  * @param {Object} video HTMLMediaElement
@@ -43,6 +45,7 @@ navigator.mediaDevices
         audio: true,
     })
     .then(stream => {
+        myVideoStream = stream;
         addVideoStream(myVideo, stream);
 
         myPeer.on("call", (call) => {
@@ -69,3 +72,50 @@ navigator.mediaDevices
 myPeer.on("open", (userId) => {
     socket.emit("join-room", ROOM_ID, userId);
 });
+myPeer.on("disconnected", (userId) => {
+    console.log("disconnected=", userId);
+});
+
+/**
+ * ミュートの切り替え
+ * @param {Object} e 
+ */
+const muteUnmute = (e) => {
+    console.log(typeof(e));
+    const enabled = myVideoStream.getAudioTracks()[0].enabled;
+    if (enabled) {
+        e.classList.add("active");
+        myVideoStream.getAudioTracks()[0].enabled = false;
+    } else {
+        e.classList.remove("active");
+        myVideoStream.getAudioTracks()[0].enabled = true;
+    }
+}
+
+/**
+ * ビデオの表示切り替え
+ * @param {Object} e 
+ */
+ const playStop = (e) => {
+    const enabled = myVideoStream.getVideoTracks()[0].enabled;
+    if (enabled) {
+        e.classList.add("active");
+        myVideoStream.getVideoTracks()[0].enabled = false;
+    } else {
+        e.classList.remove("active");
+        myVideoStream.getVideoTracks()[0].enabled = true;
+    }
+}
+
+/**
+ * 通話終了
+ * @param {Object} e 
+ */
+const leaveRoom = (e) => {
+    socket.disconnect();
+    myPeer.disconnect();
+    const videos = document.getElementsByTagName("video");
+    for (let i = videos.length -1; i >= 0; --i){
+        videos[i].remove();
+    }
+}

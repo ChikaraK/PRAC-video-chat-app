@@ -23,7 +23,6 @@ video {
 }
 .main {
   height: 100vh;
-  display: flex;
 }
 .main__videos {
   flex-grow: 1;
